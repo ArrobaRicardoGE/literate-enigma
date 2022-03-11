@@ -60,6 +60,16 @@
         <form id="form" action="">
             <input id="input" autocomplete="off" /><button>Send</button>
         </form>
+        <form
+            ref="uploadForm"
+            id="uploadForm"
+            action="http://localhost:3000/upload"
+            method="post"
+            enctype="multipart/form-data"
+        >
+            <input type="file" name="sampleFile" />
+            <input type="submit" value="Upload!" />
+        </form>
         <script src="/socket.io/socket.io.js"></script>
 
         <script>
