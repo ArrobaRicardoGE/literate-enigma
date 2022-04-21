@@ -1,4 +1,5 @@
 const app = require('express')();
+const express = require('express');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const fileUpload = require('express-fileupload');
@@ -6,11 +7,16 @@ const { PythonRunner } = require('./runner');
 const port = process.env.PORT || 3000;
 
 app.use(fileUpload());
+app.use('/static', express.static(__dirname + '/static'));
 
 const runner = new PythonRunner(io);
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/pong', (req, res) => {
+    res.sendFile(__dirname + '/pong.html');
 });
 
 app.post('/upload', function (req, res) {
