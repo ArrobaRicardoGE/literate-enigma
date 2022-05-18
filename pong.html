@@ -10,10 +10,80 @@
             data-name="vs/editor/editor.main"
             href="static/monaco-editor-0.33.0/package/min/vs/editor/editor.main.css"
         />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+            crossorigin="anonymous"
+        />
     </head>
-    <body>
-        <canvas></canvas>
-        <div id="monaco_editor" style="height: 400px"></div>
+    <body style="background-color: #1e1e1e">
+        <!-- Navbar -->
+        <nav class="navbar bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand text-light" href="#">
+                    <img
+                        src="static/coliseum.webp"
+                        alt=""
+                        width="30"
+                        height="24"
+                        class="d-inline-block align-text-top"
+                    />
+                    Coliseo IA (Prototipo)
+                </a>
+            </div>
+        </nav>
+
+        <h1 class="text-light text-center mb-2 mt-5">Pong!</h1>
+
+        <!-- Controls -->
+        <div class="container text-center">
+            <div class="btn-group" role="group" aria-label="Game controls">
+                <button type="button" class="btn btn-outline-light">
+                    Play
+                </button>
+                <button type="button" class="btn btn-outline-light">
+                    Stop
+                </button>
+            </div>
+        </div>
+
+        <!-- Game and editor -->
+        <div style="padding: 20px">
+            <div
+                style="
+                    width: 50%;
+                    height: 100%;
+                    float: left;
+                    text-align: center;
+                "
+            >
+                <canvas></canvas>
+            </div>
+            <div
+                style="
+                    width: 50%;
+                    height: 100%;
+                    display: inline-block;
+                    border: white 2px solid;
+                "
+            >
+                <div id="monaco_editor" style="height: 496px"></div>
+            </div>
+        </div>
+
+        <!-- <div class="container">
+            <div class="row">
+                <div class="col">
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="row">
+                    <div id="monaco_editor" style="height: 400px"></div>
+                </div>
+            </div>
+        </div> -->
 
         <!-- Socket connections -->
         <script src="/socket.io/socket.io.js"></script>
@@ -31,16 +101,19 @@
         <script src="static/monaco-editor-0.33.0/package/min/vs/loader.js"></script>
         <script src="static/monaco-editor-0.33.0/package/min/vs/editor/editor.main.nls.js"></script>
         <script src="static/monaco-editor-0.33.0/package/min/vs/editor/editor.main.js"></script>
+        <!-- JavaScript Bundle with Popper -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            crossorigin="anonymous"
+        ></script>
 
         <script>
             var h_div = document.getElementById('monaco_editor');
             var editor = monaco.editor.create(h_div, {
-                value: [
-                    'function x() {',
-                    '\tconsole.log("Hello world!");',
-                    '}',
-                ].join('\n'),
-                language: 'javascript',
+                value: ['# write your code here'].join('\n'),
+                language: 'python',
+                theme: 'vs-dark',
             });
         </script>
     </body>
