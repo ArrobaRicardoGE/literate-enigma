@@ -41,8 +41,12 @@ app.post('/upload', function (req, res) {
 });
 
 io.on('connection', (socket) => {
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
+    socket.on('state', (msg) => {
+        console.log(msg);
+        if (msg == 'start') runner.run('temp/sample.py');
+        if (msg == 'kill') runner.kill();
+    });
+    socket.on('to_server', (msg) => {
         runner.write(msg);
     });
 });

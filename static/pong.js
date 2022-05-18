@@ -1,4 +1,12 @@
 // Global Variables
+var socket = io();
+
+socket.on('to_client', (msg) => {
+    let data = JSON.parse(msg);
+    console.log(data);
+    Pong.paddle.move = data.mov;
+});
+
 var DIRECTION = {
     IDLE: 0,
     UP: 1,
@@ -62,6 +70,7 @@ var Game = {
 
         Pong.menu();
         Pong.listen();
+        socket.emit('state', 'start');
     },
 
     endGameMenu: function (text) {
@@ -167,6 +176,11 @@ var Game = {
                 this.ball.x -= this.ball.speed;
             else if (this.ball.moveX === DIRECTION.RIGHT)
                 this.ball.x += this.ball.speed;
+
+            if (this.paddle.move === DIRECTION.UP)
+                this.paddle.y -= this.paddle.speed;
+            else if (this.paddle.move === DIRECTION.DOWN)
+                this.paddle.y += this.paddle.speed;
             // AI
             // // Handle paddle (AI) UP and DOWN movement
             // if (this.paddle.y > this.ball.y - this.paddle.height / 2) {
@@ -340,6 +354,15 @@ var Game = {
     loop: function () {
         Pong.update();
         Pong.draw();
+        // Update
+        socket.emit(
+            'to_server',
+            JSON.stringify({
+                ball_pos: [Pong.ball.x, Pong.ball.y],
+                my_pos: Pong.paddle.y,
+                mov: 0,
+            })
+        );
 
         // If the game is not over, draw the next frame.
         if (!Pong.over) requestAnimationFrame(Pong.loop);

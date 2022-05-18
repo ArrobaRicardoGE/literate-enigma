@@ -12,7 +12,7 @@ class Runner {
         this.process = spawn(this.command, args);
         this.process.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);
-            this.io.emit('chat message', ab2str(data));
+            this.io.emit('to_client', ab2str(data));
         });
         this.process.stderr.on('data', (data) => {
             console.log(`stderr: ${data}`);
@@ -21,6 +21,10 @@ class Runner {
 
     write(data) {
         this.process.stdin.write(`${data}\n`);
+    }
+
+    kill() {
+        this.process.kill('SIGINT');
     }
 }
 
