@@ -1,5 +1,6 @@
 // Global Variables
 const socket = io();
+let animationID;
 
 socket.on('to_client', (msg) => {
     console.log('in');
@@ -22,7 +23,7 @@ socket.on('ack', (msg) => {
     if (msg == 'good') {
         Pong.running = true;
         socket.emit('state', 'start');
-        window.requestAnimationFrame(Pong.loop);
+        animationID = window.requestAnimationFrame(Pong.loop);
     } else {
         window.alert(msg);
     }
@@ -32,7 +33,6 @@ window.onbeforeunload = (event) => {
     console.log(Pong.running);
     if (Pong.running) {
         socket.emit('state', 'stop');
-        console.log('in');
     }
     event.returnValue = 'Reload';
 };
@@ -105,8 +105,8 @@ var Game = {
 
     endGameMenu: function (text) {
         console.log('stop');
-        Pong.over = true;
-        Pong.running = false;
+        this.over = true;
+        this.running = false;
         socket.emit('state', 'stop');
         // Change the canvas font size and color
         Pong.context.font = '50px Courier New';
@@ -130,12 +130,11 @@ var Game = {
             Pong.canvas.height / 2 + 15
         );
 
-        console.log(text);
-
         setTimeout(function () {
-            Pong = Object.assign({}, Game);
+            cancelAnimationFrame(animationID);
+            // Pong = Object.assign({}, Game);
             Pong.initialize();
-        }, 3000);
+        }, 1000);
     },
 
     menu: function () {
@@ -401,7 +400,7 @@ var Game = {
         );
 
         // If the game is not over, draw the next frame.
-        if (!Pong.over) requestAnimationFrame(Pong.loop);
+        if (!Pong.over) animationID = requestAnimationFrame(Pong.loop);
     },
 
     listen: function () {
@@ -424,21 +423,6 @@ var Game = {
         // Stop the player from moving when there are no keys being pressed.
         document.addEventListener('keyup', function (key) {
             Pong.player.move = DIRECTION.IDLE;
-        });
-
-        document.getElementById('play').addEventListener('click', (_) => {
-            if (Pong.running === false) {
-                socket.emit('upload', editor.getValue());
-            }
-        });
-
-        document.getElementById('stop').addEventListener('click', (_) => {
-            if (Pong.running) {
-                Pong.over = true;
-                setTimeout(function () {
-                    Pong.endGameMenu('Game Over!');
-                }, 1000);
-            }
         });
     },
 
@@ -464,6 +448,21 @@ var Game = {
         return newColor;
     },
 };
+
+document.getElementById('play').addEventListener('click', (_) => {
+    if (Pong.running === false) {
+        socket.emit('upload', editor.getValue());
+    }
+});
+
+document.getElementById('stop').addEventListener('click', (_) => {
+    if (Pong.running) {
+        Pong.over = true;
+        setTimeout(function () {
+            Pong.endGameMenu('Game Over!');
+        }, 1000);
+    }
+});
 
 var Pong = Object.assign({}, Game);
 Pong.initialize();
