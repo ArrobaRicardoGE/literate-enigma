@@ -3,8 +3,17 @@ var socket = io();
 
 socket.on('to_client', (msg) => {
     let data = JSON.parse(msg);
-    console.log(data);
     Pong.paddle.move = data.mov;
+});
+
+socket.on('ack', (msg) => {
+    if (msg == 'good') {
+        Pong.running = true;
+        socket.emit('state', 'start');
+        window.requestAnimationFrame(Pong.loop);
+    } else {
+        window.alert(msg);
+    }
 });
 
 var DIRECTION = {
@@ -27,7 +36,7 @@ var Ball = {
             y: this.canvas.height / 2 - 9,
             moveX: DIRECTION.IDLE,
             moveY: DIRECTION.IDLE,
-            speed: incrementedSpeed || 9,
+            speed: incrementedSpeed || 5,
         };
     },
 };
@@ -57,6 +66,7 @@ var Game = {
 
         this.canvas.style.width = this.canvas.width / 2 + 'px';
         this.canvas.style.height = this.canvas.height / 2 + 'px';
+        this.canvas.style.border = 'white 2px solid';
 
         this.player = Paddle.new.call(this, 'left');
         this.paddle = Paddle.new.call(this, 'right');
@@ -66,25 +76,25 @@ var Game = {
         this.running = this.over = false;
         this.turn = this.paddle;
         this.timer = this.round = 0;
-        this.color = '#2c3e50';
+        this.color = '#1e1e1e';
 
         Pong.menu();
         Pong.listen();
-        //socket.emit('state', 'start');
     },
 
     endGameMenu: function (text) {
+        socket.emit('state', 'stop');
         // Change the canvas font size and color
         Pong.context.font = '50px Courier New';
         Pong.context.fillStyle = this.color;
 
         // Draw the rectangle behind the 'Press any key to begin' text.
-        // Pong.context.fillRect(
-        //     Pong.canvas.width / 2 - 350,
-        //     Pong.canvas.height / 2 - 48,
-        //     700,
-        //     100
-        // );
+        Pong.context.fillRect(
+            Pong.canvas.width / 2 - 350,
+            Pong.canvas.height / 2 - 48,
+            700,
+            100
+        );
 
         // Change the canvas color;
         Pong.context.fillStyle = '#ffffff';
@@ -95,6 +105,8 @@ var Game = {
             Pong.canvas.width / 2,
             Pong.canvas.height / 2 + 15
         );
+
+        console.log(text);
 
         setTimeout(function () {
             Pong = Object.assign({}, Game);
@@ -370,12 +382,11 @@ var Game = {
 
     listen: function () {
         document.addEventListener('keydown', function (key) {
-            return;
             // Handle the 'Press any key to begin' function and start the game.
-            if (Pong.running === false) {
-                Pong.running = true;
-                window.requestAnimationFrame(Pong.loop);
-            }
+            // if (Pong.running === false) {
+            //     Pong.running = true;
+            //     window.requestAnimationFrame(Pong.loop);
+            // }
 
             // Handle up arrow and w key events
             if (key.keyCode === 38 || key.keyCode === 87)
@@ -389,6 +400,22 @@ var Game = {
         // Stop the player from moving when there are no keys being pressed.
         document.addEventListener('keyup', function (key) {
             Pong.player.move = DIRECTION.IDLE;
+        });
+
+        document.getElementById('play').addEventListener('click', (_) => {
+            if (Pong.running === false) {
+                socket.emit('upload', editor.getValue());
+            }
+        });
+
+        document.getElementById('stop').addEventListener('click', (_) => {
+            // console.log(Pong.running);
+            if (Pong.running) {
+                Pong.over = true;
+                setTimeout(function () {
+                    Pong.endGameMenu('Game Over!');
+                }, 1000);
+            }
         });
     },
 

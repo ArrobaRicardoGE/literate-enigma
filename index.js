@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 const fileUpload = require('express-fileupload');
 const { PythonRunner } = require('./runner');
 const port = process.env.PORT || 3000;
+const fs = require('fs');
 
 app.use(fileUpload());
 app.use('/static', express.static(__dirname + '/static'));
@@ -43,11 +44,58 @@ app.post('/upload', function (req, res) {
 io.on('connection', (socket) => {
     socket.on('state', (msg) => {
         console.log(msg);
-        if (msg == 'start') runner.run('temp/sample.py');
-        if (msg == 'kill') runner.kill();
+        if (msg == 'start') runner.run('temp/test.py');
+        if (msg == 'stop') runner.kill();
     });
     socket.on('to_server', (msg) => {
         runner.write(msg);
+    });
+    socket.on('upload', (msg) => {
+        msg = `import json
+
+class PongGameInterface:
+    def __init__(self):
+        self.state = {
+            'ball_pos': [0, 0],
+            'my_pos': 0,
+            'mov': 0
+        }
+
+    def _request_update(self):
+        self.state = json.loads(input())
+
+    def _send_update(self):
+        print(json.dumps(self.state))
+
+    def get_my_position(self):
+        return self.state['my_pos']
+
+    def get_ball_position(self):
+        return self.state['ball_pos']
+
+    def set_movement(self, dir):
+        if dir != 0 and dir != 1 and dir != 2:
+            raise Exception()
+        self.state['mov'] = dir
+        
+${msg}
+    def __init__(self):
+        self.api = PongGameInterface()
+
+if __name__ == '__main__':
+    gm = Pong()
+    while True:
+        gm.api._request_update()
+        gm.strategy()
+        gm.api._send_update()
+    `;
+        fs.writeFile('temp/test.py', msg, (err) => {
+            if (err) {
+                socket.emit('ack', 'error' + err.message);
+                return;
+            }
+            socket.emit('ack', 'good');
+        });
     });
 });
 

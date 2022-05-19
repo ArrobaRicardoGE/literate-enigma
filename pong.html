@@ -39,10 +39,10 @@
         <!-- Controls -->
         <div class="container text-center">
             <div class="btn-group" role="group" aria-label="Game controls">
-                <button type="button" class="btn btn-outline-light">
+                <button type="button" class="btn btn-outline-light" id="play">
                     Play
                 </button>
-                <button type="button" class="btn btn-outline-light">
+                <button type="button" class="btn btn-outline-light" id="stop">
                     Stop
                 </button>
             </div>
@@ -72,19 +72,6 @@
             </div>
         </div>
 
-        <!-- <div class="container">
-            <div class="row">
-                <div class="col">
-                    <canvas></canvas>
-                </div>
-            </div>
-            <div class="row">
-                <div class="row">
-                    <div id="monaco_editor" style="height: 400px"></div>
-                </div>
-            </div>
-        </div> -->
-
         <!-- Socket connections -->
         <script src="/socket.io/socket.io.js"></script>
 
@@ -111,10 +98,38 @@
         <script>
             var h_div = document.getElementById('monaco_editor');
             var editor = monaco.editor.create(h_div, {
-                value: ['# write your code here'].join('\n'),
+                value: [
+                    `class Pong: 
+
+    ''' 
+    Puedes acceder a la API usando la propiedad self.api
+    Los metodos disponibles son:
+        - get_my_position()
+        Regresa un entero representando la posicion en Y de la IA.
+        
+        - get_ball_position()
+        Regresa un arreglo de exactamente dos flotantes, el primero
+        representa la posicion en X y el segundo en Y de la bola.
+
+        - set_movement(dir)
+        Recibe un entero que indica la direccion a la que debe de
+        moverse la IA:
+                0 para DETENERSE
+                1 para ARRIBA
+                2 para ABAJO
+        
+    '''
+    def strategy(self):
+        # Escribe tu codigo aqui. Se ejecutara cada cuadro
+        return
+                `,
+                ].join('\n'),
                 language: 'python',
                 theme: 'vs-dark',
             });
+            // document.getElementById('play').addEventListener('click', (_) => {
+            //     console.log(editor.getValue());
+            // });
         </script>
     </body>
 </html>
