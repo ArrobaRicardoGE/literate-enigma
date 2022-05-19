@@ -46,11 +46,12 @@ class Pong:
         
     '''
     def strategy(self):
-        # Escribe tu codigo aqui. Se ejecutara cada cuadro
         if self.api.get_my_position() > self.api.get_ball_position()[1]:
-            self.api.set_movement(1)
-        else:
-            self.api.set_movement(2)
+            self.api.set_movement(1) # move up
+        elif self.api.get_my_position() < self.api.get_ball_position()[1]:
+            self.api.set_movement(2) # move down
+        else: 
+            self.api.set_movement(0) # stop
                 
     def __init__(self):
         self.api = PongGameInterface()

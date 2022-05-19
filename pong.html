@@ -96,10 +96,12 @@
         ></script>
 
         <script>
-            var h_div = document.getElementById('monaco_editor');
-            var editor = monaco.editor.create(h_div, {
+            const h_div = document.getElementById('monaco_editor');
+            const code = localStorage.getItem('code');
+            const editor = monaco.editor.create(h_div, {
                 value: [
-                    `class Pong: 
+                    code ||
+                        `class Pong: 
 
     ''' 
     Puedes acceder a la API usando la propiedad self.api
@@ -127,9 +129,9 @@
                 language: 'python',
                 theme: 'vs-dark',
             });
-            // document.getElementById('play').addEventListener('click', (_) => {
-            //     console.log(editor.getValue());
-            // });
+            editor.getModel().onDidChangeContent((event) => {
+                localStorage.setItem('code', editor.getValue());
+            });
         </script>
     </body>
 </html>

@@ -1,12 +1,24 @@
 // Global Variables
-var socket = io();
+const socket = io();
 
 socket.on('to_client', (msg) => {
-    let data = JSON.parse(msg);
-    Pong.paddle.move = data.mov;
+    console.log('in');
+    try {
+        let data = JSON.parse(msg);
+        console.log(data['error']);
+        if (data['error']) {
+            alert('Error: ' + data['error']);
+            Pong.endGameMenu('AI crashed :(');
+            return;
+        }
+        Pong.paddle.move = data.mov;
+    } catch {
+        console.log(msg);
+    }
 });
 
 socket.on('ack', (msg) => {
+    console.log(msg);
     if (msg == 'good') {
         Pong.running = true;
         socket.emit('state', 'start');
@@ -15,6 +27,15 @@ socket.on('ack', (msg) => {
         window.alert(msg);
     }
 });
+
+window.onbeforeunload = (event) => {
+    console.log(Pong.running);
+    if (Pong.running) {
+        socket.emit('state', 'stop');
+        console.log('in');
+    }
+    event.returnValue = 'Reload';
+};
 
 var DIRECTION = {
     IDLE: 0,
@@ -83,6 +104,9 @@ var Game = {
     },
 
     endGameMenu: function (text) {
+        console.log('stop');
+        Pong.over = true;
+        Pong.running = false;
         socket.emit('state', 'stop');
         // Change the canvas font size and color
         Pong.context.font = '50px Courier New';
@@ -258,9 +282,9 @@ var Game = {
                 // If there is another round, reset all the values and increment the round number.
                 this.color = this._generateRoundColor();
                 this.player.score = this.paddle.score = 0;
-                this.player.speed += 0.5;
-                this.paddle.speed += 1;
-                this.ball.speed += 1;
+                // this.player.speed += 0.5;
+                // this.paddle.speed += 1;
+                // this.ball.speed += 1;
                 this.round += 1;
 
                 // beep3.play();
@@ -409,7 +433,6 @@ var Game = {
         });
 
         document.getElementById('stop').addEventListener('click', (_) => {
-            // console.log(Pong.running);
             if (Pong.running) {
                 Pong.over = true;
                 setTimeout(function () {
@@ -421,7 +444,7 @@ var Game = {
 
     // Reset the ball location, the player turns and set a delay before the next round begins.
     _resetTurn: function (victor, loser) {
-        this.ball = Ball.new.call(this, this.ball.speed);
+        this.ball = Ball.new.call(this /*this.ball.speed*/);
         this.turn = loser;
         this.timer = new Date().getTime();
 

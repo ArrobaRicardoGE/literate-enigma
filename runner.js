@@ -16,6 +16,10 @@ class Runner {
         });
         this.process.stderr.on('data', (data) => {
             console.log(`stderr: ${data}`);
+            data = ab2str(data).replace(/(\r\n|\n|\r)/gm, '');
+            data = data.replace(/"/gm, "'");
+            data = data.replace(/\\/gm, '/');
+            this.io.emit('to_client', `{"error": "${data}"}`);
         });
     }
 
